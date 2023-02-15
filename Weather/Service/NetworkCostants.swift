@@ -8,16 +8,20 @@
 import Foundation
 
 struct NetworkCostants {
-    static let baseURL: String = "https://api.tomorrow.io/v4/weather/realtime"
-    static let apiKeyValue = ""
+    static let baseURL = URL(string: "https://api.tomorrow.io/v4/weather")!
+    static let apiKeyValue = getKey()
+    
     static let defaultHeaders: [String: String] = [
-        "accept": "application/json",
-      // "apikey": apiKeyValue
+        "accept": "application/json"
     ]
     
-    static let parameters: [String: Any] = [
-        "apikey": "",
+    static let parameters: [String: String] = [
+        "apikey": getKey(),
         "location": "guarulhos"
     ]
     
+    static func getKey() -> String {
+        guard let key = getenv("apikey") else { return "" }
+        return String(utf8String: key) ?? ""
+    }
 }

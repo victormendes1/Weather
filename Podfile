@@ -6,7 +6,7 @@ target 'Weather' do
   use_frameworks!
 
   # Pods for Weather
-  pod 'Moya/Combine', '~> 15.0'
-  pod 'Alamofire'
-  
+  pod 'Moya/RxSwift', '~> 15.0'
+  pod 'RxSwift', '6.5.0'
+  pod 'RxCocoa', '6.5.0'
 end

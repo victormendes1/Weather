@@ -5,8 +5,6 @@
 //  Created by Victor Mendes on 14/02/23.
 //
 
-import Foundation
-
 enum ServiceError: Error {
     case serverError
     case unknownError
@@ -16,6 +14,7 @@ enum ServiceError: Error {
         switch self {
         case .serverError:
             return "Server Error"
+            
         case .unknownError:
             return "Unknown Error"
             

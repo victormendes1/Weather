@@ -6,24 +6,18 @@
 //
 
 import UIKit
-import Combine
+import RxSwift
+import RxRelay
+import RxCocoa
 
 final class ViewController: UIViewController {
     @IBOutlet weak var temperature: UILabel!
     @IBOutlet weak var currentWeatherImage: UIImageView!
     
-    private var subscriptions = Set<AnyCancellable>()
-    let viewModel: WeatherViewModelProtocol = WeatherViewModel()
-    
-    // MARK: - Init
-//    init(viewModel: WeatherViewModelProtocol) {
-//        self.viewModel = viewModel
-//        super.init(nibName: nil, bundle: nil)
-//    }
-    
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
+    private let viewModel: WeatherViewModelProtocol = WeatherViewModel()
+    private let bag = DisposeBag()
+    private var location: String = "Guarulhos"
+    private var request: Bool = true
     
     // MARK: - Life cycle
     override func loadView() {
@@ -33,45 +27,37 @@ final class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewModel.loadCurrentTemperature()
-        
+        viewModel.loadCurrentTemperature(location)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.temperature.alpha = 0
-        self.currentWeatherImage.alpha = 0
+        temperature.alpha = 0
+        currentWeatherImage.alpha = 0
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut) {
+        startAnimation()
+    }
+}
+
+// MARK: - Extension
+extension ViewController {
+    private func bind() {
+        viewModel.currentTemperature
+            .map { value in
+                self.startAnimation(with: true)
+                return value
+            }
+            .bind(to: temperature.rx.text)
+            .disposed(by: bag)
+    }
+    
+    private func startAnimation(with temperature: Bool = false)  {
+        UIView.animate(withDuration: 0.2, delay: 0.1, options: .curveEaseOut) {
+            self.temperature.alpha = temperature ? 1 : 0
             self.currentWeatherImage.alpha = 1
         }
     }
-    
-    private func bind() {
-        viewModel.currentTemperature1
-            .sink { completion in
-                
-            } receiveValue: { currentTemperature in
-                self.temperature.text = currentTemperature
-                UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut) {
-                    self.temperature.alpha = 1
-                }
-            }
-            .store(in: &subscriptions)
-
-        viewModel.currentTemperature
-            .sink { completion in
-                
-            } receiveValue: { currentTemperature in
-                self.temperature.text = currentTemperature
-            }
-            .store(in: &subscriptions)
-
-        
-    }
-    
 }
-
